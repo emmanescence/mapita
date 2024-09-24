@@ -5,6 +5,10 @@ import yfinance as yf
 import pandas as pd
 import streamlit as st
 
+# Define la lista de tickers
+tickers = ['BMA.BA', 'GGAL.BA', 'YPFD.BA']  # Agrega los tickers que necesites
+tickers_panel_lider = ['BMA.BA']  # Define tus paneles según sea necesario
+
 # Función para descargar logos
 def download_logo(ticker):
     logo_url = f"https://example.com/logos/{ticker.split('.')[0]}.png"  # Cambia esta URL a donde se encuentran los logotipos
@@ -21,9 +25,6 @@ def download_logo(ticker):
         return logo_path
     else:
         return None  # Retorna None si no se puede descargar
-
-# Tickers (se mantienen los tickers que tenías)
-# ...
 
 # Función para obtener datos
 def get_data(tickers, period='1d', value_metric='Capitalización'):
@@ -68,10 +69,16 @@ def get_data(tickers, period='1d', value_metric='Capitalización'):
     return pd.DataFrame(data)
 
 # Configuración de la aplicación Streamlit
-# ...
+st.title("Análisis de Acciones")
+
+# Selección del periodo
+period = st.selectbox("Selecciona el periodo", ['1d', '1wk', '1mo', '1y'])
+
+# Selección del valor
+value_metric = st.selectbox("Selecciona el valor a mostrar", ['Capitalización', 'Volumen'])
 
 # Obtener datos
-resultados = get_data(tickers, period_mapping.get(period, '1d'), value_metric)
+resultados = get_data(tickers, period, value_metric)
 
 # Filtrar datos válidos
 resultados = resultados.dropna(subset=['Value', 'Rendimiento'])
@@ -86,7 +93,6 @@ if not resultados.empty:
                      color='Rendimiento',
                      color_continuous_scale=[(0, 'red'), (0.5, 'white'), (1, 'darkgreen')],
                      color_continuous_midpoint=0,
-                     range_color=[-range_colors, range_colors],
                      title=f"Panel general: {value_metric} y Rendimiento ({period})")
 
     # Agregar imágenes de logotipos
