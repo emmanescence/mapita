@@ -1,7 +1,27 @@
+import os
+import requests
+from PIL import Image
 import yfinance as yf
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+# Función para descargar logos
+def download_logo(ticker):
+    logo_url = f"https://example.com/logos/{ticker.split('.')[0]}.png"  # Cambia esta URL a donde se encuentran los logotipos
+    logo_path = f"logos/{ticker.split('.')[0]}.png"
+    
+    # Crea el directorio si no existe
+    os.makedirs(os.path.dirname(logo_path), exist_ok=True)
+    
+    # Descarga la imagen
+    response = requests.get(logo_url)
+    if response.status_code == 200:
+        with open(logo_path, 'wb') as f:
+            f.write(response.content)
+        return logo_path
+    else:
+        return None  # Retorna None si no se puede descargar
 
 # Tickers
 tickers_panel_lider = [
@@ -59,6 +79,9 @@ def get_data(tickers, period='1d', value_metric='Capitalización'):
                 # Agregar panel como 'Panel Líder' o 'Panel General'
                 panel_type = 'Panel Líder' if ticker in tickers_panel_lider else 'Panel General'
 
+                # Descargar el logo
+                logo_path = download_logo(ticker)
+
                 data.append({
                     'Ticker': ticker,
                     'Panel': panel_type,
@@ -66,7 +89,7 @@ def get_data(tickers, period='1d', value_metric='Capitalización'):
                     'Rendimiento': performance,
                     'Capitalización': capi,
                     'Value': value,
-                    'Logo': f"https://github.com/tu_usuario/tu_repositorio/raw/main/{ticker.split('.')[0]}.png"  # URL de la imagen
+                    'Logo': logo_path  # Guarda la ruta del logo descargado
                 })
             else:
                 continue  # Omitir si no hay suficientes datos para calcular el rendimiento
@@ -133,4 +156,5 @@ if not resultados.empty:
     st.plotly_chart(fig)
 else:
     st.warning("No hay datos válidos para mostrar.")
+
 
