@@ -20,7 +20,7 @@ tickers_panel_general = [
 ]
 
 # URL base de GitHub donde están alojados los logotipos (ajusta según tu repositorio)
-base_url_logos = "https://raw.githubusercontent.com/usuario/repositorio/main/logos/"  # Ajusta esta URL
+base_url_logos = "https://github.com/emmanescence/mapita/blob/main/BMA.png"  # Ajusta esta URL
 
 # Función para obtener datos
 def get_data(tickers, period='1d', value_metric='Capitalización'):
