@@ -19,9 +19,6 @@ tickers_panel_general = [
     'ROSE.BA', 'SAMI.BA', 'SEMI.BA'
 ]
 
-# URL base de GitHub donde están alojados los logotipos (ajusta según tu repositorio)
-base_url_logos = "https://github.com/emmanescence/mapita/blob/main/BMA.png"  # Ajusta esta URL
-
 # Función para obtener datos
 def get_data(tickers, period='1d', value_metric='Capitalización'):
     data = []
@@ -62,9 +59,6 @@ def get_data(tickers, period='1d', value_metric='Capitalización'):
                 # Agregar panel como 'Panel Líder' o 'Panel General'
                 panel_type = 'Panel Líder' if ticker in tickers_panel_lider else 'Panel General'
 
-                # Crear la URL del logotipo
-                logo_url = f"{base_url_logos}{ticker}.png"
-
                 data.append({
                     'Ticker': ticker,
                     'Panel': panel_type,
@@ -72,7 +66,7 @@ def get_data(tickers, period='1d', value_metric='Capitalización'):
                     'Rendimiento': performance,
                     'Capitalización': capi,
                     'Value': value,
-                    'Logo': logo_url  # Agregar la URL del logo
+                    'Logo': f"https://github.com/tu_usuario/tu_repositorio/raw/main/{ticker.split('.')[0]}.png"  # URL de la imagen
                 })
             else:
                 continue  # Omitir si no hay suficientes datos para calcular el rendimiento
@@ -127,20 +121,16 @@ if not resultados.empty:
                      range_color=[-range_colors, range_colors],  # Ajusta según el rango de rendimiento esperado
                      title=f"Panel general: {value_metric} y Rendimiento ({period})")
 
-    # Ajustar el tamaño del gráfico
-    fig.update_layout(width=2500, height=800)
-
-    # Personalizar la información en las etiquetas
+    # Personalizar la información en las etiquetas con logotipos
     fig.update_traces(textinfo="label+text+value",
-                      texttemplate="<b>%{label}</b><br><b>%{customdata[0]:.2f}%</b>" if not pd.isna(resultados['Rendimiento']).any() else "<b>%{label}</b>")
+                      texttemplate="<b>%{label}</b><br><img src='%{customdata[0]}' style='height: 40px; width: 40px;'><br><b>%{customdata[1]:.2f}%</b>",
+                      customdata=resultados[['Logo', 'Rendimiento']].values.tolist())  # Agregar logos y rendimiento
+
+    # Ajustar el tamaño del gráfico
+    fig.update_layout(width=2500, height=800)  # Puedes ajustar estos valores según sea necesario
 
     # Mostrar el gráfico en Streamlit
     st.plotly_chart(fig)
-
-    # Mostrar logotipos debajo del gráfico
-    st.subheader('Logotipos de las Acciones:')
-    for index, row in resultados.iterrows():
-        st.image(row['Logo'], width=50, caption=row['Ticker'])
-
 else:
     st.warning("No hay datos válidos para mostrar.")
+
